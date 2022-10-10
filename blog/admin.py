@@ -19,18 +19,19 @@ class PostAdmin(admin.ModelAdmin):
 
     list_filter = (
         'status',
+        'topics',
     )
 
     prepopulated_fields = {'slug': ('title',)}
     pass
 
-"""@admin.register(models.Topic)
+@admin.register(models.Topic)
 class TopicAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'slug',
     )
-    prepopulated_fields = {'slug': ('name',)}"""
+    prepopulated_fields = {'slug': ('name',)}
 
 # Register the `Post` model
 admin.site.register(models.Post, PostAdmin)

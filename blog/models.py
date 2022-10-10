@@ -54,7 +54,7 @@ class Post(models.Model):
         help_text='The date & time this article was published',
     )
     slug = models.SlugField(
-        null=True,
+        null=False,
         unique_for_date='published',
     )
     topics = models.ManyToManyField(

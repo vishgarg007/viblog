@@ -2,7 +2,7 @@
 from django.conf import settings
 from django.db import models
 
-'''class Topic(models.Model):
+"""class Topic(models.Model):
     name = models.CharField(
         max_length=50,
         unique=True,  # No duplicates!
@@ -16,7 +16,7 @@ from django.db import models
         ordering = ['name']
 
     def __str__(self):
-        return self.name'''
+        return self.name"""
 
 class Post(models.Model):
     """
@@ -54,13 +54,13 @@ class Post(models.Model):
         help_text='The date & time this article was published',
     )
     slug = models.SlugField(
-        null=False,
+        null=True,
         unique_for_date='published',
     )
-    '''topics = models.ManyToManyField(
+    """topics = models.ManyToManyField(
         Topic,
         related_name='blog_posts'
-    )'''
+    )"""
     class Meta:
         # Sort by the `created` field. The `-` prefix
         # specifies to order in descending/reverse order.

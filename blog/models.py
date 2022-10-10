@@ -2,6 +2,18 @@
 from django.conf import settings
 from django.db import models
 
+class Topic(models.Model):
+    name = models.CharField(
+        max_length=50,
+        unique=True  # No duplicates!
+    )
+    slug = models.SlugField(unique=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
 
 class Post(models.Model):
     """
@@ -41,6 +53,10 @@ class Post(models.Model):
     slug = models.SlugField(
         null=False,
         unique_for_date='published',
+    )
+    topics = models.ManyToManyField(
+        Topic,
+        related_name='blog_posts'
     )
     class Meta:
         # Sort by the `created` field. The `-` prefix

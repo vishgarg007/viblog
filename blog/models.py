@@ -69,3 +69,18 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+class Comment(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100, null=False)
+    email = models.CharField(max_length=100, default='mail.com')
+    comment = models.TextField(max_length=100)
+    approve = models.BooleanField(default=True)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)  # Updates on each save
+
+    class Meta:
+        ordering = ['-created_on']
+
+    def __str__(self):
+        return self.comment[:60]

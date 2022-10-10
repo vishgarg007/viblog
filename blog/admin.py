@@ -2,6 +2,7 @@
 
 from django.contrib import admin
 from . import models
+from .models import Post, Comment
 
 class PostAdmin(admin.ModelAdmin):
     list_display = (
@@ -32,6 +33,15 @@ class TopicAdmin(admin.ModelAdmin):
         'slug',
     )
     prepopulated_fields = {'slug': ('name',)}
+
+class CommentInline(admin.StackedInline):
+    model = Comment
+    extra = 0
+
+class PostAdmin(admin.ModelAdmin):
+    inlines = [
+        CommentInline,
+    ]
 
 # Register the `Post` model
 admin.site.register(models.Post, PostAdmin)

@@ -1,3 +1,4 @@
+<!-- templates/post_detail.html -->
 {% extends 'base.html' %}
 
 {% block content %}
@@ -6,8 +7,8 @@
 <hr>
 <h2 id="comments">Comments</h2>
 {% for comment in post.comment_set.all %}
-<b>{{ comment.name }}</b> said <b>{{ comment.created_on|timesince }} ago</b>
-<p>{{ comment.comment }}</p>
+<b>{{ comment.name }}</b> with the email <b>{{ comment.email }}</b> commented: <b>{{ comment.comment }}</b>
+<p><b>{{ comment.created_on|timesince }} ago</b></p>
 {% empty %}
 <p>Feel free to leave the first comment!</p>
 {% endfor %}

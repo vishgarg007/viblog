@@ -70,14 +70,23 @@ class Post(models.Model):
     def __str__(self):
         return self.title
 
+class PostManager(models.Manager):
+    """
+    PostManger to exclude the unchecked check box
+    """
+    def get_queryset(self):
+        queryset = super().get_queryset()  # Get the initial queryset
+        return queryset.exclude(approve=False)  # Exclude deleted records
+
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, null=False)
-    email = models.CharField(max_length=100, default='mail.com')
+    email = models.CharField(max_length=100, null=False, default='Plase enter email')
     comment = models.TextField(max_length=100)
     approve = models.BooleanField(default=True)
     created_on = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)  # Updates on each save
+    objects = PostManager()
 
     class Meta:
         ordering = ['-created_on']

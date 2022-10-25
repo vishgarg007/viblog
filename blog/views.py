@@ -4,6 +4,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.urls import reverse
 from .models import Post, Comment
 from .forms import CommentForm
+from django.shortcuts import render
 
 
 class PostListView(ListView):

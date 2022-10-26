@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Sum, Q
-
-from blog.models import Comment, Post
+from blog.models import Post, Comment
+from django.db.models import Count
 
 User = get_user_model()
 
@@ -10,15 +10,14 @@ def question_1_return_active_users():
     Return the results of a query which returns a list of all
     active users in the database.
     """
-    users = User.query.filter_by(status="Active").all()
+    return User.objects.filter(is_active="True").all()
 
 def question_2_return_regular_users():
     """
     Return the results of a query which returns a list of users that
     are *not* staff and *not* superusers
     """
-    users = User.query.filter_by(permissions="Active").all()
-
+    return User.objects.all()
 
 def question_3_return_all_posts_for_user(user):
     """
@@ -26,24 +25,21 @@ def question_3_return_all_posts_for_user(user):
     be returned in reverse chronological order from when they
     were created.
     """
-    Post.objects.filter(user=user).order_by('created')
-
+    user = User.objects.get(username='vishal')
+    return Post.objects.filter(author=user)
 
 def question_4_return_all_posts_ordered_by_title():
     """
     Return all Post objects, ordered by their title.
     """
-    return Post.objects.all().order_by('title')
-
+    return Post.objects.order_by('title')
 
 def question_5_return_all_post_comments(post):
     """
     Return all the comments made for the post provided in order
     of last created.
     """
-    post.blog_posts.all().order_by('-created')
-
-
+    return post.blog_posts.all().order_by('-created')
 
 def question_6_return_the_post_with_the_most_comments():
     """
@@ -51,17 +47,14 @@ def question_6_return_the_post_with_the_most_comments():
     the database. Do not concern yourself with approval status;
     return the object which has generated the most activity.
     """
-    most = Blog.objects.annotate(number_of_entries=Count('comment'))
-    most[0].number_of_entries
-
+    return Post.objects.annotate(Count('comment')).values('title','comment__count')
 
 def question_7_create_a_comment(post):
     """
     Create and return a comment for the post object provided.
     """
     post = Post.objects.get(title='1st Post', author=user)
-    comment = Comment.objects.create(name='Hello')
-
+    return Comment.objects.create(post=post1, name = 'vishal', email ='vishal.garg@gmail.com', comment ='test123')
 
 def question_8_set_approved_to_false(comment):
     """
@@ -71,9 +64,8 @@ def question_8_set_approved_to_false(comment):
     comment.is_published = True
     comment.save()
 
-
 def question_9_delete_post_and_all_related_comments(post):
     """
     Delete the post object provided, and all related comments.
     """
-    Post.objects.filter(title__contains='10th Post').delete()
+    return Post.objects.filter(title__contains='10th Post').delete()

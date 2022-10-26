@@ -81,7 +81,7 @@ class PostManager(models.Manager):
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, null=False)
-    email = models.CharField(max_length=100, null=False, content='Please enter email')
+    email = models.CharField(max_length=100, null=False, default='Please enter email')
     comment = models.TextField(max_length=100)
     approve = models.BooleanField(default=True)
     created_on = models.DateTimeField(auto_now_add=True)

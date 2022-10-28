@@ -2,19 +2,26 @@ from django.views import View
 from django.views.generic import ListView, DetailView, FormView
 from django.views.generic.detail import SingleObjectMixin
 from django.urls import reverse
-from .models import Post, Comment
+from .models import Post, Comment, PostManager, Topic, PublishedManager
 from .forms import CommentForm
 from django.shortcuts import render
+from . import models
 
+def home(request):
+    # Get last 3 posts
+    latest_posts = models.Post.objects.published().order_by('-published')[:3]
+    # Add as context variable "latest_posts"
+    context = {'latest_posts': latest_posts}
+    return render(request, 'blog/home.html', context)
 
 class PostListView(ListView):
     model = Post
-    template_name = 'home.html'
+    template_name = 'blog/home.html'
     context_object_name = 'posts'
 
 class PostDisplay(DetailView):
     model = Post
-    template_name = 'post_detail.html'
+    template_name = 'blog/post_detail.html'
     context_object_name = 'post'
 
     def get_context_data(self, **kwargs):
@@ -25,7 +32,7 @@ class PostDisplay(DetailView):
 class PostComment(SingleObjectMixin, FormView):
     model = Post
     form_class = CommentForm
-    template_name = 'post_detail.html'
+    template_name = 'blog/post_detail.html'
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -44,7 +51,7 @@ class PostComment(SingleObjectMixin, FormView):
 
     def get_success_url(self):
         post = self.get_object()
-        return reverse('post_detail', kwargs={'pk': post.pk}) + '#comments'
+        return reverse('blog/post_detail', kwargs={'pk': post.pk}) + '#comments'
 
 class PostDetailView(View):
 

@@ -2,6 +2,10 @@
 from django.conf import settings
 from django.db import models
 
+class PublishedManager(models.Manager):
+    def get_queryset(self):
+        return super(PublishedManager, self).get_queryset().filter(status='published')
+
 class Topic(models.Model):
     name = models.CharField(
         max_length=50,
@@ -61,6 +65,8 @@ class Post(models.Model):
         Topic,
         related_name='blog_posts'
     )
+    pub = PublishedManager()
+
     class Meta:
         # Sort by the `created` field. The `-` prefix
         # specifies to order in descending/reverse order.

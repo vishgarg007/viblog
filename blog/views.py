@@ -2,16 +2,27 @@ from django.views import View
 from django.views.generic import ListView, DetailView, FormView
 from django.views.generic.detail import SingleObjectMixin
 from django.urls import reverse
-from .models import Post, Comment, PostManager, Topic, PublishedManager
+from .models import Post, Comment, PostManager, Topic, PostQueryset
 from .forms import CommentForm
 from django.shortcuts import render
 from . import models
+from django.db.models import Count
 
 def home(request):
-    # Get last 3 posts
-    latest_posts = models.Post.objects.published().order_by('-published')[:3]
-    # Add as context variable "latest_posts"
-    context = {'latest_posts': latest_posts}
+    """
+    The Blog homepage
+    """
+    latest_posts = models.Post.objects.published().order_by('-published')[:4]
+    authors = models.Post.objects.published().get_authors().order_by('first_name')
+    default_topics = models.Topic.objects.popular_topics()
+    topics = models.Post.objects.values('topics').annotate(dcount=Count('id')).order_by('-dcount')[:5]
+
+    context = {
+        'authors': authors,
+        'latest_posts': latest_posts,
+        'topics': topics,
+    }
+
     return render(request, 'blog/home.html', context)
 
 class PostListView(ListView):

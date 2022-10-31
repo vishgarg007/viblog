@@ -1,10 +1,19 @@
 # blog/models.py
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
+from django.contrib.auth import get_user_model
+from django.db.models import Count
 
-class PublishedManager(models.Manager):
-    def get_queryset(self):
-        return super(PublishedManager, self).get_queryset().filter(status='published')
+class PostQueryset(models.QuerySet):
+    def published(self):
+        return self.filter(status=self.model.PUBLISHED)
+    def get_authors(self):
+        User = get_user_model()
+        # Get the users who are authors of this queryset
+        return User.objects.filter(blog_posts__in=self).distinct()
+    def popular_topics(self):
+        return Topic.objects.all()
 
 class Topic(models.Model):
     name = models.CharField(
@@ -16,8 +25,7 @@ class Topic(models.Model):
         unique=True,
         null=False,
     )
-    class Meta:
-        ordering = ['name']
+    objects = PostQueryset.as_manager()
 
     def __str__(self):
         return self.name
@@ -65,13 +73,16 @@ class Post(models.Model):
         Topic,
         related_name='blog_posts'
     )
-    pub = PublishedManager()
+    objects = PostQueryset.as_manager()
 
     class Meta:
         # Sort by the `created` field. The `-` prefix
         # specifies to order in descending/reverse order.
         # Otherwise, it will be in ascending order.
         ordering = ['created']
+    def publish(self):
+        self.status = self.PUBLISHED
+        self.published = timezone.now()
 
     def __str__(self):
         return self.title

@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 from . import models
-from .models import Post, Comment
+from .models import Post, Comment, Topic
 
 @admin.register(models.Topic)
 class TopicAdmin(admin.ModelAdmin):

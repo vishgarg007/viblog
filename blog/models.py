@@ -11,8 +11,6 @@ class PostQueryset(models.QuerySet):
     def get_authors(self):
         User = get_user_model()
         return User.objects.filter(blog_posts__in=self).distinct()
-    def popular_topics(self):
-        return Post.objects.all()
 
 class Topic(models.Model):
     name = models.CharField(

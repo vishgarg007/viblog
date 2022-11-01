@@ -14,7 +14,7 @@ def home(request):
     """
     latest_posts = models.Post.objects.published().order_by('-published')[:5]
     authors = models.Post.objects.published().get_authors().order_by('first_name')
-    topics = models.Post.objects.values('topics').annotate(dcount=Count('id')).order_by('-dcount')[:5]
+    topics = models.Post.objects.values('topics').annotate(dcount=Count('id')).order_by('-dcount')
 
     context = {
         'authors': authors,

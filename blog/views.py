@@ -12,9 +12,8 @@ def home(request):
     """
     The Blog homepage
     """
-    latest_posts = models.Post.objects.published().order_by('-published')[:4]
+    latest_posts = models.Post.objects.published().order_by('-published')[:5]
     authors = models.Post.objects.published().get_authors().order_by('first_name')
-    default_topics = models.Topic.objects.popular_topics()
     topics = models.Post.objects.values('topics').annotate(dcount=Count('id')).order_by('-dcount')[:5]
 
     context = {

@@ -10,10 +10,9 @@ class PostQueryset(models.QuerySet):
         return self.filter(status=self.model.PUBLISHED)
     def get_authors(self):
         User = get_user_model()
-        # Get the users who are authors of this queryset
         return User.objects.filter(blog_posts__in=self).distinct()
     def popular_topics(self):
-        return Topic.objects.all()
+        return Post.objects.all()
 
 class Topic(models.Model):
     name = models.CharField(

@@ -1,6 +1,7 @@
 from django.views import View
 from django.views.generic import ListView, DetailView, FormView
 from django.views.generic.detail import SingleObjectMixin
+from django.views.generic.base import TemplateView
 from django.urls import reverse
 from .models import Post, Comment, PostManager, Topic, PostQueryset
 from .forms import CommentForm
@@ -8,26 +9,62 @@ from django.shortcuts import render
 from . import models
 from django.db.models import Count
 
-def home(request):
+class ContextMixin:
     """
-    The Blog homepage
+    Provides common context variables for blog views
     """
-    latest_posts = models.Post.objects.published().order_by('-published')[:5]
-    authors = models.Post.objects.published().get_authors().order_by('first_name')
-    topics = models.Post.objects.values('topics').annotate(dcount=Count('id')).order_by('-dcount')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['authors'] = models.Post.objects.published() \
+            .get_authors() \
+            .order_by('first_name')
 
-    context = {
-        'authors': authors,
-        'latest_posts': latest_posts,
-        'topics': topics,
-    }
+        context['topics'] = models.Post.objects.values_list('topics__name', flat=True)
 
-    return render(request, 'blog/home.html', context)
+        return context
+
+class HomeView(TemplateView):
+    template_name = 'blog/home.html'
+
+    def get_context_data(self, **kwargs):
+        # Get the parent context
+        context = super().get_context_data(**kwargs)
+
+        latest_posts = models.Post.objects.published() \
+            .order_by('-published')[:5]
+
+        context.update({
+            'latest_posts': latest_posts,
+        })
+
+        return context
+
+class AboutView(ContextMixin, TemplateView):
+    template_name = 'blog/about.html'
 
 class PostListView(ListView):
-    model = Post
-    template_name = 'blog/home.html'
+    model = models.Post
+    """template_name = 'blog/home.html'"""
     context_object_name = 'posts'
+    queryset = models.Post.objects.published().order_by('-published')
+
+class TopicListView(ListView):
+    model = models.Topic
+    """template_name = 'blog/home.html'"""
+    context_object_name = 'topicsmain'
+    queryset = models.Topic.objects.order_by('name')
+
+class TopicDetailView(DetailView):
+    model = models.Topic
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        # If this is a `pk` lookup, use default queryset
+        if 'pk' in self.kwargs:
+            return queryset
+
+        # Otherwise, filter on the published date
+        return queryset
 
 class PostDisplay(DetailView):
     model = Post
@@ -63,12 +100,22 @@ class PostComment(SingleObjectMixin, FormView):
         post = self.get_object()
         return reverse('blog/post_detail', kwargs={'pk': post.pk}) + '#comments'
 
-class PostDetailView(View):
+class PostDetailView(DetailView):
+    model = models.Post
 
-    def get(self, request, *args, **kwargs):
-        view = PostDisplay.as_view()
-        return view(request, *args, **kwargs)
+    def get_queryset(self):
+        queryset = super().get_queryset().published()
 
-    def post(self, request, *args, **kwargs):
-        view = PostComment.as_view()
-        return view(request, *args, **kwargs)
+        # If this is a `pk` lookup, use default queryset
+        if 'pk' in self.kwargs:
+            return queryset
+
+        # Otherwise, filter on the published date
+        return queryset.filter(
+            published__year=self.kwargs['year'],
+            published__month=self.kwargs['month'],
+            published__day=self.kwargs['day'],
+        )
+
+def terms_and_conditions(request):
+   return render(request, 'blog/terms_and_conditions.html')

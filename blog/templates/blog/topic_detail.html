@@ -5,5 +5,8 @@
 
 {% block main %}
 <h1>{{topic.name}}</h1>
-
+<hr>
+{% for post in posts %}
+    {{ post }}
+  {% endfor %}<br>
 {% endblock %}

@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.db.models import Count
 from django.urls import reverse
+from ckeditor_uploader.fields import RichTextUploadingField
 
 class PostQueryset(models.QuerySet):
     def published(self):
@@ -83,6 +84,13 @@ class Post(models.Model):
     )
     objects = PostQueryset.as_manager()
 
+    banner = models.ImageField(
+        blank=True,
+        null=True,
+        help_text='A banner image for the post'
+    )
+    content = RichTextUploadingField()
+
     def get_absolute_url(self):
         if self.published:
             kwargs = {
@@ -131,3 +139,30 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.comment[:60]
+
+class Contact(models.Model):
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    email = models.EmailField()
+    message = models.TextField()
+    submitted = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-submitted']
+
+    def __str__(self):
+        return f'{self.submitted.date()}: {self.email}'
+
+class Contest(models.Model):
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    email = models.EmailField()
+    photo = models.FileField()
+    submitted = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Photo Contest Submissions'
+        ordering = ['-submitted']
+
+    def __str__(self):
+        return f''

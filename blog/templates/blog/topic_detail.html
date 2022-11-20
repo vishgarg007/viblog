@@ -1,12 +1,15 @@
 <!-- {# blog/templates/blog/topic_detail.html #} -->
 {% extends "blog/base.html" %}
 
-{% block page_title %}{{ topic.name }}{% endblock %}
+{% block page_title %}{{ topic }}{% endblock %}
 
 {% block main %}
-<h1>{{topic.name}}</h1>
+<h1>{{topic}}</h1>
 <hr>
-{% for post in posts %}
-    {{ post }}
-  {% endfor %}<br>
+{% for post in topic.post_set.all %}
+{{ post.categories.title }}
+<p>{{ post.author }}</p>
+{{ post.content|safe|slice:":200" }}
+{% include "blog/post_preview.html" %}
+{%endfor%}
 {% endblock %}

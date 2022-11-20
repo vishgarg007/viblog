@@ -24,13 +24,16 @@ urlpatterns = [
 
 ]"""
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
+from django.conf import settings
+from django.conf.urls.static import static
 
 from blog import views  # Import the blog views
 urlpatterns = [
     path('admin/',admin.site.urls),
     # path('', views.home, name='home'), # Set root to home view
     path('', views.HomeView.as_view(), name='home'),
+    path('form_example/', views.form_example, name='form-example'),
     path('about/', views.AboutView.as_view(), name='about'),
     path('terms/', views.terms_and_conditions, name='terms_and_conditions'),
     path('posts/', views.PostListView.as_view(), name='post_list'),
@@ -50,4 +53,12 @@ urlpatterns = [
         views.TopicDetailView.as_view(),
         name='topic_detail',
     ),
-]
+    path(
+        'formview-example/',
+        views.FormViewExample.as_view(),
+        name='formview-example'
+    ),
+    path('contact/', views.ContactFormView.as_view(), name='contact'),
+    path('contest/', views.ContestFormView.as_view(), name='contest'),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
